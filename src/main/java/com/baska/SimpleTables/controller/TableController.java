@@ -1,6 +1,9 @@
 package com.baska.SimpleTables.controller;
 
 import com.baska.SimpleTables.dto.table.CreateRequest;
+import com.baska.SimpleTables.dto.table.ExecuteQueryRequest;
+import com.baska.SimpleTables.dto.table.QueryRequest;
+import com.baska.SimpleTables.dto.table.RowDataRequest;
 import com.baska.SimpleTables.service.Impl.TableServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +22,21 @@ public class TableController {
         return ResponseEntity.ok("");
     }
 
-    @PostMapping("/table/{id}")
-    public ResponseEntity<?> addData(@PathVariable Integer id, @RequestBody String jsonData) {
-        tableServiceImpl.addData(id,jsonData);
+    @PostMapping("/row")
+    public ResponseEntity<?> addData(@RequestBody RowDataRequest data) {
+        tableServiceImpl.addData(data);
         return ResponseEntity.ok("");
     }
+
+    @PostMapping("/query")
+    public ResponseEntity<?> addQuery(@RequestBody QueryRequest request) {
+        tableServiceImpl.addQuery(request);
+        return ResponseEntity.ok("");
+    }
+
+    @GetMapping("/query")
+    public ResponseEntity<?> execQuery(@RequestBody ExecuteQueryRequest queryRequest) {
+        return ResponseEntity.ok(tableServiceImpl.execQuery(queryRequest));
+    }
+
 }

@@ -2,6 +2,9 @@ package com.baska.SimpleTables.repository.Impl;
 
 import com.baska.SimpleTables.dto.table.CreateRequest;
 import com.baska.SimpleTables.dto.table.CreateTableType;
+import com.baska.SimpleTables.dto.table.ExecuteQueryRequest;
+import com.baska.SimpleTables.model.Parameters;
+import com.baska.SimpleTables.model.Querys;
 import com.baska.SimpleTables.model.Tables;
 import com.baska.SimpleTables.model.Type;
 import com.baska.SimpleTables.repository.TableRepository;
@@ -9,9 +12,13 @@ import com.baska.SimpleTables.repository.TablesReposotiry;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Repository
@@ -20,6 +27,8 @@ public class TableRepositoryImpl implements TableRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final TablesReposotiry tablesReposotiry;
+
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @SneakyThrows
     private String getColumnQuery(Set<CreateTableType> columns){
@@ -64,7 +73,7 @@ public class TableRepositoryImpl implements TableRepository {
     }
 
     @Override
-    public void saveData(HashMap<String,Object> data, Tables table) {
+    public void saveData(Map<String,Object> data, Tables table) {
         String columns = "";
         String values = "";
         for(Type type :table.getColumns()){
@@ -105,6 +114,25 @@ public class TableRepositoryImpl implements TableRepository {
 
 
         return true;
+    }
+
+    @Override
+    public List<Map<String,Object>> execQuery(Querys query,ExecuteQueryRequest request) {
+
+        String SQLString  = query.getQuery();
+
+        //String SQLString = "Select Н.Название,p.Дата,p.Количество,p.Цена from Продажи as p left join Номенклатура as Н on Н.id = p.Номенклатура where p.id = :id and p.Количество = :Количество";
+        MapSqlParameterSource paramSource = new MapSqlParameterSource();
+        Set<Parameters> parameters = query.getParameters();
+        Map<String,Object> values = request.getValues();
+        for(Parameters parameter : parameters){
+            String param =parameter.getName();
+            paramSource.addValue(param, values.get(param));
+        }
+        List<Map<String,Object>> obj = namedParameterJdbcTemplate.queryForList(SQLString,paramSource);
+        return  obj;
+
+
     }
 
 

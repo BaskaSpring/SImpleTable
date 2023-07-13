@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "querys")
+@Table(name = "parameters")
 public class Parameters {
 
     @Id
